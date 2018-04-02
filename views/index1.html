@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.js"></script>
+    <style>
+        h2{
+            border-top: 1px solid #111;
+        }
+    </style>
+</head>
+<body>
+<div id="current_user"></div>
+<h2>用户</h2>
+<div>
+    <h3>登录</h3>
+    <div>
+        <label for="">
+            账号：
+            <input type="text" name="loginName">
+        </label>
+        <label for="">
+            密码：
+            <input type="text" name="loginPwd">
+        </label>
+        <label for="">
+            <button onclick="login()">登录</button>
+        </label>
+    </div>
+</div>
+
+<div>
+    <h3>注册</h3>
+    <div>
+        <label for="">
+            账号：
+            <input type="text" name="regName" onkeyup="checkAccount(this)">
+        </label>
+        <p id="register_account_remind"></p>
+        <label for="">
+            密码：
+            <input type="text" name="regPwd">
+        </label>
+        <label for="">
+            昵称：
+            <input type="text" name="regNickName">
+        </label>
+        <label for="">
+            性别：
+            <input type="radio" value="male" name="regGender">男
+            <input type="radio" value="famale" name="regGender">女
+        </label>
+        <label for="">
+            <button onclick="register()">注册</button>
+        </label>
+    </div>
+</div>
+
+<div>
+    <h3>修改密码</h3>
+    <div>
+        <label for="">
+            旧密码：
+            <input type="text" name="oldPwd">
+        </label>
+        <label for="">
+            新密码：
+            <input type="text" name="newPwd">
+        </label>
+        <label for="">
+            <button onclick="updatePwd()">确认修改</button>
+        </label>
+    </div>
+</div>
+
+<div>
+    <h3>修改头像</h3>
+    <div>
+        <label for="">
+            头像：
+            <input type="text" name="head_thumb">
+        </label>
+        <label for="">
+            <button onclick="updateHeadThumb()">确认修改</button>
+        </label>
+    </div>
+</div>
+
+<div>
+    <h3>修改昵称</h3>
+    <div>
+        <label for="">
+            昵称：
+            <input type="text" name="update_nickname">
+        </label>
+        <label for="">
+            <button onclick="updateNickname()">确认修改</button>
+        </label>
+    </div>
+</div>
+
+
+<div>
+    <h3>新增背景</h3>
+    <div>
+        <label for="">
+            url：
+            <input type="text" name="bg_url">
+        </label>
+        <label for="">
+            desc：
+            <input type="text" name="bg_desc">
+        </label>
+        <label for="">
+            link：
+            <input type="text" name="bg_link">
+        </label>
+        <label for="">
+            type：
+            <select name="" id="bg_type">
+                <option value="ad_page">广告页面</option>
+                <option value="user_bg">用户背景</option>
+            </select>
+        </label>
+        <label for="">
+            <button onclick="addBackground()">新增背景</button>
+            <button onclick="getBackgroundList()">获取背景列表</button>
+            <button onclick="getShowOne('ad_page')">广告推送</button>
+            <button onclick="getShowOne('user_bg')">用户推送</button>
+        </label>
+    </div>
+</div>
+
+<div id="backgroun_list"></div>
+
+<div id="edit_background_box">
+    <h3>当前显示的背景</h3>
+    <div>
+        <label for="">
+            url：
+            <input type="text" name="edit_bg_url">
+        </label>
+        <label for="">
+            desc：
+            <input type="text" name="edit_bg_desc">
+        </label>
+        <label for="">
+            link：
+            <input type="text" name="edit_bg_link">
+        </label>
+        <label for="">
+            type：
+            <select name="" id="edit_bg_type">
+                <option value="ad_page">广告页面</option>
+                <option value="user_bg">用户背景</option>
+            </select>
+        </label>
+        <label for="">
+            <button onclick="editBackground()">编辑</button>
+        </label>
+    </div>
+</div>
+
+
+<h2>主题</h2>
+<div>
+    <h3>创建主题</h3>
+    <div>
+        <label for="">
+            主题名称：
+            <input type="text" name="theme_name">
+        </label>
+        <label for="">
+            主题封面：
+            <input type="text" name="theme_cover">
+        </label>
+        <label for="">
+            <button onclick="addTheme()">确认修改</button>
+        </label>
+    </div>
+</div>
+
+<div>
+    <h3>获取主题列表</h3>
+    <div>
+        <label for="">
+            关键字：
+            <input type="text" name="theme_keyword">
+        </label>
+        <label for="">
+            <button onclick="getThemeList()">查找</button>
+        </label>
+    </div>
+    <ol id="all_theme"></ol>
+    <div id="theme_details"></div>
+
+</div>
+<h3>帖子列表</h3>
+<ol id="post_list"></ol>
+<h3>回复列表</h3>
+<ol id="reply_list"></ol>
+<div id="edit_post" style="width: 600px; height: 400px; display: none; position: fixed; left: 50%; top: 50%; margin-left: -300px; margin-top: -200px; background: #fff; border: 1px solid #111;">
+    <h3>发帖</h3>
+    <label for="">
+        标题：
+        <input type="text" name="post_bar_title">
+    </label>
+    <label for="">
+        内容：
+        <textarea name="post_bar_content" id="post_bar_content" cols="30" rows="10"></textarea>
+    </label>
+    <label for="">
+        <button onclick="publishPostBar()">发帖</button>
+    </label>
+    <p onclick="$('#edit_post').hide();">关闭</p>
+</div>
+
+<div id="edit_reply" style="width: 600px; height: 400px; display: none; position: fixed; left: 50%; top: 50%; margin-left: -300px; margin-top: -200px; background: #fff; border: 1px solid #111;">
+    <h3>回复</h3>
+    <label for="">
+        内容：
+        <textarea name="post_bar_content" id="reply_content" cols="30" rows="10"></textarea>
+    </label>
+    <label for="">
+        <button onclick="addReply()">回复</button>
+    </label>
+    <p onclick="$('#edit_reply').hide();">关闭</p>
+</div>
+
+<button onclick="getMine()">获取我发布的</button>
+
+<div style="height: 300px;"></div>
+<script>
+    $(function() {
+        getUser();
+    })
+    // 获取登录用户
+    function getUser() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/getUser',
+            success: function(res) {
+                if (res.state) {
+                    $("#current_user").html('<p>'+res.data.nickname+'</p><p onclick="logout()">注销</p>');
+                } else {
+                    $("#current_user").html('<a>请登录</a>');
+                }
+            }
+        })
+    }
+    // 登录
+    function login() {
+        var data = {
+            account: $("input[name='loginName']").val(),
+            password: $("input[name='loginPwd']").val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/login',
+            data: data,
+            success: function(res) {
+                getUser();
+                getMyfocusList();
+            }
+        })
+    }
+    // 修改密码
+    function updatePwd() {
+        var data = {
+            oldPwd: $("input[name='oldPwd']").val(),
+            newPwd: $("input[name='newPwd']").val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/updatePassword',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 修改头像
+    function updateHeadThumb() {T
+        var data = {
+            headhumb: $("input[name='head_thumb']").val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/updateHeadThumb',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 修改昵称
+    function updateNickname() {
+        var data = {
+            nickname: $("input[name='update_nickname']").val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/updateNickname',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+
+    // 注销
+    function logout() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/logout',
+            success: function(res) {
+                getUser();
+            }
+        })
+    }
+    // 注册
+    function register() {
+        var data = {
+            account: $("input[name='regName']").val(),
+            password: $("input[name='regPwd']").val(),
+            nickname: $("input[name='regNickName']").val(),
+            gender: $("input[name='regGender']").val(),
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/register',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 检查注册用户
+    function checkAccount(obj) {
+        var data = {
+            account: $(obj).val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/user/chargeIsRegister',
+            data: data,
+            success: function(res) {
+                $("#register_account_remind").text(res.message);
+            }
+        })
+    }
+
+    // 新增主题
+    function addTheme() {
+        var data = {
+            name: $("input[name='theme_name']").val(),
+            headThumb: $("input[name='theme_cover']").val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/addOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+
+    // 搜索主题
+    function getThemeList() {
+        var data = {
+            keyword: $("input[name='theme_keyword']").val()
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/getList',
+            data: data,
+            success: function(res) {
+                var list = '';
+                for (i = 0; i < res.data.length; i++) {
+                    var item = res.data[i];
+                    list += '<li>'+item.name+'<button onclick="getThemeDetails('+item.ID+')">获取详情</button>' +
+                        '<button onclick="deleteTheme('+item.ID+')">删除</button>' +
+                        '<button onclick="focusTheme('+item.ID+')">关注</button>' +
+                        '<button onclick="unFocusTheme('+item.ID+')">取消关注</button>'+
+                        '<button onclick="postBar('+item.ID+')">发帖</button>'+
+                        '<button onclick="getPostList('+item.ID+')">贴列表</button>'+
+                        '<button onclick="signIn('+item.ID+')">签到</button></li>'
+                }
+                $("#all_theme").html(list);
+            }
+        })
+    }
+    // 主题详情
+    function getThemeDetails(id) {
+        var data = {
+            themeId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/getDetails',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 删除主题
+    function deleteTheme(id) {
+        const data = {
+            themeId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/deleteOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 关注
+    function focusTheme(id) {
+        const data = {
+            themeId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/focus',
+            data: data,
+            success: function(res) {
+                console.log(res);
+                getMyfocusList();
+            }
+        })
+    }
+    // 取消关注
+    function unFocusTheme(id) {
+        const data = {
+            themeId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/unFocus',
+            data: data,
+            success: function(res) {
+                console.log(res);
+                getMyfocusList();
+            }
+        })
+    }
+    // 签到
+    function signIn(id) {
+        const data = {
+            themeId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/signIn',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 我关注的贴吧列表
+    function getMyfocusList() {
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/theme/focusList',
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 发帖
+    var currentBarId = '';
+    function postBar(id) {
+        $("#edit_post").show();
+        currentBarId = id;
+    }
+    function publishPostBar() {
+        var data = {
+            themeId: currentBarId,
+            title: $("input[name='post_bar_title']").val(),
+            content: $("#post_bar_content").val(),
+            imgList: JSON.stringify(['1', '2', '3'])
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/post/addOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 贴列表
+    function getPostList(id) {
+        var data = {
+            themeId: id,
+            pageId: 1,
+            pageSize: 10
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/post/getList',
+            data: data,
+            success: function(res) {
+                var str = '';
+                if (res.state) {
+                    for (var i = 0; i < res.data.list.length; i++) {
+                        var item =res.data.list[i];
+                        str += '<li>'+item.title+
+                            '<button onclick="deletePost('+item.ID+')">删除</button>' +
+                            '<button onclick="getPostDetails('+item.ID+')">详情</button>' +
+                            '<button onclick="getReplyList('+item.ID+')">获取回复</button>' +
+                            '<button onclick="openReply('+item.ID+')">新增回复</button>' +
+                            '</li>'
+                    }
+                }
+                $("#post_list").html(str);
+            }
+        })
+    }
+    // 删除帖子
+    function deletePost(id) {
+        var data = {
+            postId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/post/deleteOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+                if (res.state) {
+                    getPostList(id);
+                }
+            }
+        })
+    }
+    // 贴详情
+    function getPostDetails(id) {
+        var data = {
+            postId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/post/getDetails',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 获取回复列表
+    function getReplyList(id) {
+        var data = {
+            postId: id,
+            pageId: 1,
+            pageSize: 10
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/reply/getList',
+            data: data,
+            success: function(res) {
+                console.log(res);
+                var str = '';
+                if (res.state) {
+                    for (var i = 0; i < res.data.list.length; i++) {
+                        var item =res.data.list[i];
+                        str += '<li>'+item.content+
+                            '<button onclick="deleteReply('+item.ID+')">删除</button>' +
+                            '</li>'
+                    }
+                }
+                $("#reply_list").html(str);
+            }
+        })
+    }
+    // 新增回复
+    var currentPostId = ''
+    function openReply(id) {
+        currentPostId = id;
+        $('#edit_reply').show();
+    }
+    function addReply() {
+        var data = {
+            postId: currentPostId,
+            content: $("#reply_content").val(),
+            imgList: JSON.stringify(['2', '3', '4'])
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/reply/addOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 删除回复
+    function deleteReply(id) {
+        var data = {
+            replyId: id
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/reply/deleteOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+
+    // 新增背景
+    function addBackground() {
+        var data = {
+            url: $("input[name='bg_url']").val(),
+            desc: $("input[name='bg_url']").val(),
+            link: $("input[name='bg_link']").val(),
+            type: $("#bg_type").val()
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/background/addOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 获取列表
+    function getBackgroundList() {
+        var data = {
+            type: 'ad_page'
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/background/getList',
+            data: data,
+            success: function(res) {
+                console.log(res);
+                var str = '';
+                if (res.state) {
+                    for (var i = 0; i < res.data.list.length; i++) {
+                        var item =res.data.list[i];
+                        str += '<li>'+item.bg_desc+
+                            '<button onclick="deleteBackground('+item.ID+')">删除</button>' +
+                            '<button onclick="setShow('+item.ID+')">显示</button>' +
+                            '</li>'
+                    }
+                }
+                $("#backgroun_list").html(str);
+            }
+        })
+    }
+
+    // 删除背景
+    function deleteBackground(id) {
+        var data = {
+            backgroundId: id
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/background/deleteOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 设置显示
+    function setShow(id) {
+        var data = {
+            backgroundId: id,
+            show: true
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/background/setShow',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+    // 获取当前显示的这一个
+    var currentBgId = ""
+    function getShowOne(type) {
+        var data = {
+            type: type
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/background/getShowOne',
+            data: data,
+            success: function(res) {
+                if (res.state) {
+                    currentBgId = res.data.ID
+                    $("input[name='edit_bg_url']").val(res.data.bg_url);
+                    $("input[name='edit_bg_desc']").val(res.data.bg_desc);
+                    $("input[name='edit_bg_link']").val(res.data.bg_link);
+                    $("#edit_bg_type").find("option[value="+res.data.bg_type+"]").attr("selected", "selected");
+                } else {
+                    console.log(res.message);
+                }
+            }
+        })
+    }
+    // 编辑背景
+    function editBackground() {
+        var data = {
+            backgroundId: currentBgId,
+            url: $("input[name='edit_bg_url']").val(),
+            desc: $("input[name='edit_bg_url']").val(),
+            link: $("input[name='edit_bg_link']").val(),
+            type: $("#edit_bg_type").val()
+        }
+        console.log(data);
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/background/editOne',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+
+    // 获取我发布的
+    function getMine() {
+        var data = {
+            pageId: 1,
+            pageSize: 10
+        }
+        $.ajax({
+            type: 'POST',
+            url: 'http://localhost:5000/post/getMine',
+            data: data,
+            success: function(res) {
+                console.log(res);
+            }
+        })
+    }
+
+</script>
+</body>
+</html>
