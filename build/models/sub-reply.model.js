@@ -22,6 +22,21 @@ class SubReplyModel {
             return row;
         });
     }
+    // 获取单挑详情
+    static getDetails(subReplyId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sql = `SELECT A.*, B.nickname AS user_nickname, B.head_thumb AS user_head_thumb
+        FROM sub_reply AS A
+        LEFT JOIN user AS B ON B.ID = A.user_id
+        WHERE A.ID = ?`;
+            const row = yield database_1.default(sql, [
+                subReplyId
+            ]).catch((err) => {
+                console.log(err);
+            });
+            return row;
+        });
+    }
     // 新增
     static addOne(content, replyId, userId) {
         return __awaiter(this, void 0, void 0, function* () {

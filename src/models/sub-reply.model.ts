@@ -11,6 +11,19 @@ export default class SubReplyModel {
         })
         return row;
     }
+    // 获取单挑详情
+    static async getDetails(subReplyId: number) {
+        const sql = `SELECT A.*, B.nickname AS user_nickname, B.head_thumb AS user_head_thumb
+        FROM sub_reply AS A
+        LEFT JOIN user AS B ON B.ID = A.user_id
+        WHERE A.ID = ?`;
+        const row = await query(sql, [
+            subReplyId
+        ]).catch((err) => {
+            console.log(err)
+        })
+        return row;
+    }
     // 新增
     static async addOne(content: string, replyId: number, userId: number) {
         const sql = `INSERT INTO sub_reply 

@@ -11,6 +11,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../controllers/DB/database");
 const post_model_1 = require("./post.model");
 class ReplyModel {
+    // 获取最初二次回复的回复
+    static getBasicList(postId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const sql = `SELECT * FROM reply WHERE post_id = ?`;
+            const row = yield database_1.default(sql, [
+                postId
+            ]).catch((err) => {
+                console.log(err);
+            });
+            return row;
+        });
+    }
     // 获取基本信息
     static getBasic(replyId) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -26,22 +38,24 @@ class ReplyModel {
     // 新增回复
     static addOne(postId, userId, content, imgList) {
         return __awaiter(this, void 0, void 0, function* () {
+            const row = yield post_model_1.default.getBasic(postId);
+            const buildingCount = row[0].building_count + 1;
             const addTime = new Date().getTime();
             const sql = `INSERT INTO reply 
-        (user_id, post_id, content, images, add_time, sub_reply_count) 
-        VALUES (?, ?, ?, ?, ?, ?)`;
-            const row = yield database_1.default(sql, [
+        (user_id, post_id, content, images, add_time, sub_reply_count, building_num) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+            const row2 = yield database_1.default(sql, [
                 userId,
                 postId,
                 content,
                 imgList,
                 addTime,
-                0
+                0,
+                buildingCount
             ]).catch((err) => {
                 console.log(err);
             });
-            console.log(row);
-            return row;
+            return row2;
         });
     }
     // 获取回复详情

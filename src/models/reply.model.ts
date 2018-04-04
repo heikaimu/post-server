@@ -8,6 +8,16 @@ interface addToDbInter {
 }
 
 export default class ReplyModel {
+    // 获取最初二次回复的回复
+    static async getBasicList(postId: number) {
+        const sql = `SELECT * FROM reply WHERE post_id = ?`;
+        const row = await query(sql, [
+            postId
+        ]).catch((err) => {
+            console.log(err)
+        })
+        return row;
+    }
     // 获取基本信息
     static async getBasic(replyId: number) {
         const sql = `SELECT * FROM reply WHERE ID = ?`;
@@ -20,22 +30,24 @@ export default class ReplyModel {
     }
     // 新增回复
     static async addOne(postId: number, userId: number, content: number, imgList: string) {
+        const row = await PostModel.getBasic(postId);
+        const buildingCount = row[0].building_count + 1;
         const addTime = new Date().getTime();
         const sql = `INSERT INTO reply 
-        (user_id, post_id, content, images, add_time, sub_reply_count) 
-        VALUES (?, ?, ?, ?, ?, ?)`;
-        const row = await query(sql, [
+        (user_id, post_id, content, images, add_time, sub_reply_count, building_num) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const row2 = await query(sql, [
             userId,
             postId,
             content,
             imgList,
             addTime,
-            0
+            0,
+            buildingCount
         ]).catch((err) => {
             console.log(err)
         })
-        console.log(row);
-        return row;
+        return row2;
     }
     // 获取回复详情
     static async getDetails(replyId: number) {

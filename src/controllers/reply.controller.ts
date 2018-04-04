@@ -1,7 +1,7 @@
 import ReplyModel from '../models/reply.model';
-import PostController from './post.controller';
 import SubReplyModel from '../models/sub-reply.model';
 import NewMessageModel from '../models/new-message.model';
+import PostModel from '../models/post.model';
 
 interface returnValInter {
     state: boolean;
@@ -33,22 +33,16 @@ export default class ReplyController {
             const imgList = req.body.imgList;
             const row = await ReplyModel.addOne(postId, userId, content, imgList);
             const replyId = (<addToDbInter>row).insertId;
-            const postBasic = await PostController.getBasic(postId);
-            const postUserId = postBasic.data.user_id;
+            const postBasic = await PostModel.getBasic(postId);
+            const postUserId = postBasic[0].user_id;
             const subReplyId = -1;
             if ((<addToDbInter>row).affectedRows === 1) {
-                const countAdd = PostController.replyCountAddOne(postId);
-                const newMessage = NewMessageModel.addOne('reply', userId, postUserId, postId, replyId, subReplyId);
-                if (countAdd && newMessage) {
-                    return {
-                        state: true,
-                        message: '回复成功'
-                    }
-                } else {
-                    return {
-                        state: false,
-                        message: '回复失败'
-                    }
+                PostModel.replyCountAddOne(postId);
+                PostModel.buildingCountAddOne(postId);
+                NewMessageModel.addReply(userId, postUserId, postId, replyId, subReplyId);
+                return {
+                    state: true,
+                    message: '回复成功'
                 }
             } else {
                 return {
@@ -76,8 +70,8 @@ export default class ReplyController {
                 }
             } else {
                 const postId = replyDetails[0].post_id;
-                const postBasic = await PostController.getBasic(postId);
-                if (replyDetails[0].user_id === userId || postBasic.data.user_id === userId) { // 如果是本人的回复或者楼主则可以删除
+                const postBasic = await PostModel.getBasic(postId);
+                if (replyDetails[0].user_id === userId || postBasic[0].user_id === userId) { // 如果是本人的回复或者楼主则可以删除
                     const row = await ReplyModel.deleteOne(replyId);
                     if ((<addToDbInter>row).affectedRows === 1) {
                         return {

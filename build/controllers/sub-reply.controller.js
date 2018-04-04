@@ -29,7 +29,7 @@ class SubReplyController {
                 if (row.affectedRows === 1) {
                     yield post_model_1.default.replyCountAddOne(postId);
                     yield reply_model_1.default.replyCountAddOne(replyId);
-                    const newMessage1 = new_message_model_1.default.addOne('subReply', userId, postUserId, postId, replyId, subReplyId);
+                    new_message_model_1.default.addSubReply(postUserId, postId, replyId, subReplyId, userId);
                     return {
                         state: true,
                         message: '回复成功',

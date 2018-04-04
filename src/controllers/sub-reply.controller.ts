@@ -28,7 +28,7 @@ export default class SubReplyController {
             if ((<addToDbInter>row).affectedRows === 1) {
                 await PostModel.replyCountAddOne(postId);
                 await ReplyModel.replyCountAddOne(replyId);
-                const newMessage1 = NewMessageModel.addOne('subReply', userId, postUserId, postId, replyId, subReplyId);
+                NewMessageModel.addSubReply(postUserId, postId, replyId, subReplyId, userId);
                 return {
                     state: true,
                     message: '回复成功',

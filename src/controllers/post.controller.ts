@@ -13,6 +13,15 @@ interface twoRowInter {
     need: any;
     all: number[]
 }
+interface replyInter {
+    ID: number;
+    content: string;
+    add_time: string;
+    post_id: number;
+    user_id: number;
+    images: string;
+    sub_reply_count: number;
+}
 export default class PostController {
     // 新增
     static async addOne(req, res): Promise<returnValInter> {
@@ -93,6 +102,13 @@ export default class PostController {
         const twoRow = await PostModel.getList(themeId, start, end);
         const count = (<twoRowInter>twoRow).all.length;
         const list = (<twoRowInter>twoRow).need;
+        for (let i = 0; i < list.length; i++) {
+            const item = list[i];
+            const { state, data } = await this.getGodReply(item.ID);
+            if (state) {
+                item.god_reply = data;
+            }
+        }
         const data = {
             count: count,
             list: list,
@@ -114,6 +130,13 @@ export default class PostController {
         const twoRow = await PostModel.getPublish(start, end);
         const count = (<twoRowInter>twoRow).all.length;
         const list = (<twoRowInter>twoRow).need;
+        for (let i = 0; i < list.length; i++) {
+            const item = list[i];
+            const { state, data } = await this.getGodReply(item.ID);
+            if (state) {
+                item.god_reply = data;
+            }
+        }
         const data = {
             count: count,
             list: list,
@@ -183,6 +206,32 @@ export default class PostController {
             return true;
         } else {
             return false;
+        }
+    }
+    // 获取神回复
+    static async getGodReply(postId) {
+        const row = await ReplyModel.getBasicList(postId);
+        if ((<replyInter[]>row).length === 0) {
+            return {
+                state: false,
+                message: '没有神回复',
+                data: ''
+            }
+        } else {
+            const godReply = row[0];
+            if (godReply.sub_reply_count === 0) {
+                return {
+                    state: false,
+                    message: '没有神回复',
+                    data: ''
+                }
+            } else {
+                return {
+                    state: true,
+                    message: '神回复有了吗？',
+                    data: godReply
+                }
+            }
         }
     }
 }

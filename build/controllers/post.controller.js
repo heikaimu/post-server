@@ -58,7 +58,7 @@ class PostController {
                 const userId = req.session.user[0].ID;
                 // 首先判断是否有权限删除
                 const postBasic = yield post_model_1.default.getBasic(postId);
-                if (postBasic[0].user_id === userId) { // 如果楼主是当前登录用户
+                if (postBasic[0].user_id === userId) {
                     const row = yield post_model_1.default.deleteOne(postId);
                     if (row.affectedRows === 1) {
                         // 删除对应的回复
@@ -101,6 +101,13 @@ class PostController {
             const twoRow = yield post_model_1.default.getList(themeId, start, end);
             const count = twoRow.all.length;
             const list = twoRow.need;
+            for (let i = 0; i < list.length; i++) {
+                const item = list[i];
+                const { state, data } = yield this.getGodReply(item.ID);
+                if (state) {
+                    item.god_reply = data;
+                }
+            }
             const data = {
                 count: count,
                 list: list,
@@ -124,6 +131,13 @@ class PostController {
             const twoRow = yield post_model_1.default.getPublish(start, end);
             const count = twoRow.all.length;
             const list = twoRow.need;
+            for (let i = 0; i < list.length; i++) {
+                const item = list[i];
+                const { state, data } = yield this.getGodReply(item.ID);
+                if (state) {
+                    item.god_reply = data;
+                }
+            }
             const data = {
                 count: count,
                 list: list,
@@ -201,6 +215,36 @@ class PostController {
             }
             else {
                 return false;
+            }
+        });
+    }
+    // 获取神回复
+    static getGodReply(postId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const row = yield reply_model_1.default.getBasicList(postId);
+            if (row.length === 0) {
+                return {
+                    state: false,
+                    message: '没有神回复',
+                    data: ''
+                };
+            }
+            else {
+                const godReply = row[0];
+                if (godReply.sub_reply_count === 0) {
+                    return {
+                        state: false,
+                        message: '没有神回复',
+                        data: ''
+                    };
+                }
+                else {
+                    return {
+                        state: true,
+                        message: '神回复有了吗？',
+                        data: godReply
+                    };
+                }
             }
         });
     }

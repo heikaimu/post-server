@@ -20,8 +20,8 @@ export default class PostModel {
     static async addOne(userId: number, themeId: number, title: string, content: string, imgList: string) {
         const addTime = new Date().getTime();
         const sql = `INSERT INTO post 
-        (title, content, add_time, user_id, theme_id, images, reply_count)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (title, content, add_time, user_id, theme_id, images, reply_count, building_count)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
         const row = await query(sql, [
             title,
@@ -30,6 +30,7 @@ export default class PostModel {
             userId,
             themeId,
             imgList,
+            0,
             0
         ]).catch((err) => {
             console.log(err)
@@ -139,7 +140,6 @@ export default class PostModel {
     // 获取详情
     static async getDetails(postId: number) {
         const row = await this.getBasic(postId);
-        console.log(row);
         const themeId = row[0].theme_id;
         const sql2 = `SELECT A.*,
         B.nickname AS user_nickname, B.head_thumb AS user_head_thumb,
@@ -167,6 +167,20 @@ export default class PostModel {
         const sql2 = `UPDATE post SET reply_count = ? WHERE ID = ?`;
         const row2 = await query(sql2, [
             currentReplyCount,
+            postId
+        ]).catch((err) => {
+            console.log(err)
+        })
+        return row2;
+    }
+    // 楼层数量+1
+    static async buildingCountAddOne(postId: number) {
+        const row = await this.getBasic(postId);
+        const buildingCount = row[0].building_count || 0;
+        const currentBuildingCount = buildingCount + 1;
+        const sql2 = `UPDATE post SET building_count = ? WHERE ID = ?`;
+        const row2 = await query(sql2, [
+            currentBuildingCount,
             postId
         ]).catch((err) => {
             console.log(err)

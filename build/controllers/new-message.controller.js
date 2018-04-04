@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const new_message_model_1 = require("../models/new-message.model");
+const post_model_1 = require("../models/post.model");
+const reply_model_1 = require("../models/reply.model");
+const sub_reply_model_1 = require("../models/sub-reply.model");
 class NewMessageController {
     // 获取当前用户未读信息
     static getList(req, res) {
@@ -16,6 +19,12 @@ class NewMessageController {
             if (req.session.user && req.session.user[0]) {
                 const userId = parseInt(req.session.user[0].ID);
                 const row = yield new_message_model_1.default.getList(userId);
+                for (let i = 0; i < row.length; i++) {
+                    const currentMessage = row[i];
+                    currentMessage.post_ifo = yield post_model_1.default.getDetails(currentMessage.post_id);
+                    currentMessage.reply_ifo = yield reply_model_1.default.getDetails(currentMessage.reply_id);
+                    currentMessage.sub_reply_ifo = yield sub_reply_model_1.default.getDetails(currentMessage.sub_reply_id);
+                }
                 return {
                     state: true,
                     message: '未读信息',

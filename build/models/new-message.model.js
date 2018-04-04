@@ -9,6 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = require("../controllers/DB/database");
+const sub_reply_model_1 = require("./sub-reply.model");
+const reply_model_1 = require("./reply.model");
+const arr_1 = require("../controllers/libs/arr");
 class NewMessageModel {
     // 获取基本信息
     static getBasic(messageId) {
@@ -23,16 +26,14 @@ class NewMessageModel {
         });
     }
     // 添加新消息(回复)
-    static addOne(type, userId, postUserId, postId, replyId, subReplyId) {
+    static addOne(type, userId, postId, replyId, subReplyId) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (postUserId === userId)
-                return true;
             const sql = `INSERT INTO new_message         (type, post_id, reply_id, user_id, sub_reply_id)         VALUES (?, ?, ?, ?, ?)        `;
             const row = yield database_1.default(sql, [
                 type,
                 postId,
                 replyId,
-                postUserId,
+                userId,
                 subReplyId
             ]).catch((err) => {
                 console.log(err);
@@ -45,10 +46,37 @@ class NewMessageModel {
             }
         });
     }
+    // 推送回复给楼主
+    static addReply(userId, postUserId, postId, replyId, subReplyId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (userId !== postUserId) {
+                yield this.addOne('reply', postUserId, postId, replyId, subReplyId);
+            }
+        });
+    }
+    // 发散消息给当前回复下的所有人
+    static addSubReply(postUserId, postId, replyId, subReplyId, subReplyUserId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const subReply = yield sub_reply_model_1.default.getList(replyId);
+            const replyIfo = yield reply_model_1.default.getBasic(replyId);
+            const replyUserId = replyIfo[0].user_id;
+            let userIdList = [postUserId, replyUserId];
+            for (let i = 0; i < subReply.length; i++) {
+                const userId = subReply[i].user_id;
+                if (userId !== subReplyUserId) {
+                    userIdList.push(userId);
+                }
+            }
+            userIdList = arr_1.removeSame(userIdList);
+            for (let i = 0; i < userIdList.length; i++) {
+                yield this.addOne('subReply', userIdList[i], postId, replyId, subReplyId);
+            }
+        });
+    }
     // 获取当前用户的未读列表
     static getList(userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sql = `SELECT A.* FROM new_message AS A WHERE A.user_id = ?`;
+            const sql = `SELECT A.*        FROM new_message AS A        WHERE A.user_id = ?`;
             const row = yield database_1.default(sql, [
                 userId
             ]).catch((err) => {

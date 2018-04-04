@@ -9,9 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const reply_model_1 = require("../models/reply.model");
-const post_controller_1 = require("./post.controller");
 const sub_reply_model_1 = require("../models/sub-reply.model");
 const new_message_model_1 = require("../models/new-message.model");
+const post_model_1 = require("../models/post.model");
 class ReplyController {
     // 新增回复
     static addOne(req, res) {
@@ -23,24 +23,17 @@ class ReplyController {
                 const imgList = req.body.imgList;
                 const row = yield reply_model_1.default.addOne(postId, userId, content, imgList);
                 const replyId = row.insertId;
-                const postBasic = yield post_controller_1.default.getBasic(postId);
-                const postUserId = postBasic.data.user_id;
+                const postBasic = yield post_model_1.default.getBasic(postId);
+                const postUserId = postBasic[0].user_id;
                 const subReplyId = -1;
                 if (row.affectedRows === 1) {
-                    const countAdd = post_controller_1.default.replyCountAddOne(postId);
-                    const newMessage = new_message_model_1.default.addOne('reply', userId, postUserId, postId, replyId, subReplyId);
-                    if (countAdd && newMessage) {
-                        return {
-                            state: true,
-                            message: '回复成功'
-                        };
-                    }
-                    else {
-                        return {
-                            state: false,
-                            message: '回复失败'
-                        };
-                    }
+                    post_model_1.default.replyCountAddOne(postId);
+                    post_model_1.default.buildingCountAddOne(postId);
+                    new_message_model_1.default.addReply(userId, postUserId, postId, replyId, subReplyId);
+                    return {
+                        state: true,
+                        message: '回复成功'
+                    };
                 }
                 else {
                     return {
@@ -72,8 +65,8 @@ class ReplyController {
                 }
                 else {
                     const postId = replyDetails[0].post_id;
-                    const postBasic = yield post_controller_1.default.getBasic(postId);
-                    if (replyDetails[0].user_id === userId || postBasic.data.user_id === userId) { // 如果是本人的回复或者楼主则可以删除
+                    const postBasic = yield post_model_1.default.getBasic(postId);
+                    if (replyDetails[0].user_id === userId || postBasic[0].user_id === userId) {
                         const row = yield reply_model_1.default.deleteOne(replyId);
                         if (row.affectedRows === 1) {
                             return {

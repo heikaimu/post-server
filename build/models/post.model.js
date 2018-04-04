@@ -27,8 +27,8 @@ class PostModel {
         return __awaiter(this, void 0, void 0, function* () {
             const addTime = new Date().getTime();
             const sql = `INSERT INTO post 
-        (title, content, add_time, user_id, theme_id, images, reply_count)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        (title, content, add_time, user_id, theme_id, images, reply_count, building_count)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
             const row = yield database_1.default(sql, [
                 title,
@@ -37,6 +37,7 @@ class PostModel {
                 userId,
                 themeId,
                 imgList,
+                0,
                 0
             ]).catch((err) => {
                 console.log(err);
@@ -156,7 +157,6 @@ class PostModel {
     static getDetails(postId) {
         return __awaiter(this, void 0, void 0, function* () {
             const row = yield this.getBasic(postId);
-            console.log(row);
             const themeId = row[0].theme_id;
             const sql2 = `SELECT A.*,
         B.nickname AS user_nickname, B.head_thumb AS user_head_thumb,
@@ -186,6 +186,22 @@ class PostModel {
             const sql2 = `UPDATE post SET reply_count = ? WHERE ID = ?`;
             const row2 = yield database_1.default(sql2, [
                 currentReplyCount,
+                postId
+            ]).catch((err) => {
+                console.log(err);
+            });
+            return row2;
+        });
+    }
+    // 楼层数量+1
+    static buildingCountAddOne(postId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const row = yield this.getBasic(postId);
+            const buildingCount = row[0].building_count || 0;
+            const currentBuildingCount = buildingCount + 1;
+            const sql2 = `UPDATE post SET building_count = ? WHERE ID = ?`;
+            const row2 = yield database_1.default(sql2, [
+                currentBuildingCount,
                 postId
             ]).catch((err) => {
                 console.log(err);
