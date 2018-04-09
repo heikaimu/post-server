@@ -98,7 +98,7 @@ class PostController {
             const pageSize = parseInt(req.body.pageSize);
             const start = (pageId - 1) * pageSize;
             const end = pageId * pageSize;
-            const twoRow = yield post_model_1.default.getList(themeId, start, end);
+            const twoRow = yield post_model_1.default.getList(themeId, start, pageSize);
             const count = twoRow.all.length;
             const list = twoRow.need;
             for (let i = 0; i < list.length; i++) {
@@ -128,7 +128,7 @@ class PostController {
             const pageSize = parseInt(req.body.pageSize);
             const start = (pageId - 1) * pageSize;
             const end = pageId * pageSize;
-            const twoRow = yield post_model_1.default.getPublish(start, end);
+            const twoRow = yield post_model_1.default.getPublish(start, pageSize);
             const count = twoRow.all.length;
             const list = twoRow.need;
             for (let i = 0; i < list.length; i++) {

@@ -49,7 +49,7 @@ export default class PostModel {
         return row;
     }
     // 获取列表
-    static async getList(themeId: number, start: number, end: number) {
+    static async getList(themeId: number, start: number, pageSize: number) {
         const sql = `SELECT A.*, 
         B.nickname AS user_nickname, B.head_thumb AS user_head_thumb, 
         C.name AS theme_name, C.head_thumb AS theme_head_thumb, 
@@ -66,7 +66,7 @@ export default class PostModel {
             themeId,
             themeId,
             start,
-            end
+            pageSize
         ]).catch((err) => {
             console.log(err)
         })
@@ -82,7 +82,7 @@ export default class PostModel {
         };
     }
     // 获取推荐列表
-    static async getPublish(start: number, end: number) {
+    static async getPublish(start: number, pageSize: number) {
         const sql = `SELECT A.*, 
         B.nickname AS user_nickname, B.head_thumb AS user_head_thumb, 
         C.name AS theme_name, C.head_thumb AS theme_head_thumb
@@ -94,7 +94,7 @@ export default class PostModel {
         `;
         const row = await query(sql, [
             start,
-            end
+            pageSize
         ]).catch((err) => {
             console.log(err)
         })

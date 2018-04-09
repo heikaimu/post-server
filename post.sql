@@ -5,13 +5,13 @@
  Source Server Type    : MySQL
  Source Server Version : 50721
  Source Host           : localhost
- Source Database       : post_bar
+ Source Database       : post
 
  Target Server Type    : MySQL
  Target Server Version : 50721
  File Encoding         : utf-8
 
- Date: 03/29/2018 16:48:29 PM
+ Date: 04/04/2018 16:35:05 PM
 */
 
 SET NAMES utf8mb4;
@@ -30,7 +30,7 @@ CREATE TABLE `background` (
   `add_time` varchar(16) NOT NULL,
   `bg_link` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `focus`
@@ -42,7 +42,21 @@ CREATE TABLE `focus` (
   `user_id` int(11) NOT NULL,
   `level` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=77 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+--  Table structure for `new_message`
+-- ----------------------------
+DROP TABLE IF EXISTS `new_message`;
+CREATE TABLE `new_message` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `type` varchar(16) NOT NULL,
+  `post_id` int(11) NOT NULL,
+  `reply_id` int(11) NOT NULL,
+  `sub_reply_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `post`
@@ -57,8 +71,9 @@ CREATE TABLE `post` (
   `theme_id` int(11) NOT NULL,
   `images` text,
   `reply_count` int(11) NOT NULL,
+  `building_count` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=58 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=63 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `reply`
@@ -71,9 +86,10 @@ CREATE TABLE `reply` (
   `post_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `images` text,
-  `sub_reply_count` int(8) NOT NULL,
+  `sub_reply_count` int(5) NOT NULL,
+  `building_num` int(5) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=66 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=86 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `sign`
@@ -85,7 +101,7 @@ CREATE TABLE `sign` (
   `user_id` int(16) NOT NULL,
   `sign_time` varchar(32) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `sub_reply`
@@ -98,7 +114,7 @@ CREATE TABLE `sub_reply` (
   `reply_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `theme`
@@ -112,7 +128,7 @@ CREATE TABLE `theme` (
   `administrator` varchar(256) DEFAULT NULL,
   `add_time` varchar(32) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 --  Table structure for `user`
@@ -128,6 +144,6 @@ CREATE TABLE `user` (
   `add_time` varchar(16) NOT NULL,
   `background` varchar(256) NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=111 DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM AUTO_INCREMENT=115 DEFAULT CHARSET=utf8;
 
 SET FOREIGN_KEY_CHECKS = 1;

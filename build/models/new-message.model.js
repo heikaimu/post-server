@@ -16,7 +16,8 @@ class NewMessageModel {
     // 获取基本信息
     static getBasic(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const sql = `SELECT A.* FROM new_message WHERE ID = messageId`;
+            console.log(messageId);
+            const sql = `SELECT * FROM new_message WHERE ID = ?`;
             const row = yield database_1.default(sql, [
                 messageId
             ]).catch((err) => {
@@ -88,6 +89,7 @@ class NewMessageModel {
     // 已阅
     static deleteOne(messageId) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(messageId);
             const messageList = yield this.getBasic(messageId);
             if (messageList.length !== 0) {
                 const sql = `DELETE FROM new_message WHERE ID = ?`;

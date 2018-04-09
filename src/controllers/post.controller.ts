@@ -99,7 +99,7 @@ export default class PostController {
         const pageSize = parseInt(req.body.pageSize);
         const start = (pageId - 1) * pageSize;
         const end = pageId * pageSize;
-        const twoRow = await PostModel.getList(themeId, start, end);
+        const twoRow = await PostModel.getList(themeId, start, pageSize);
         const count = (<twoRowInter>twoRow).all.length;
         const list = (<twoRowInter>twoRow).need;
         for (let i = 0; i < list.length; i++) {
@@ -127,7 +127,7 @@ export default class PostController {
         const pageSize = parseInt(req.body.pageSize);
         const start = (pageId - 1) * pageSize;
         const end = pageId * pageSize;
-        const twoRow = await PostModel.getPublish(start, end);
+        const twoRow = await PostModel.getPublish(start, pageSize);
         const count = (<twoRowInter>twoRow).all.length;
         const list = (<twoRowInter>twoRow).need;
         for (let i = 0; i < list.length; i++) {

@@ -59,7 +59,7 @@ class PostModel {
         });
     }
     // 获取列表
-    static getList(themeId, start, end) {
+    static getList(themeId, start, pageSize) {
         return __awaiter(this, void 0, void 0, function* () {
             const sql = `SELECT A.*, 
         B.nickname AS user_nickname, B.head_thumb AS user_head_thumb, 
@@ -77,7 +77,7 @@ class PostModel {
                 themeId,
                 themeId,
                 start,
-                end
+                pageSize
             ]).catch((err) => {
                 console.log(err);
             });
@@ -94,7 +94,7 @@ class PostModel {
         });
     }
     // 获取推荐列表
-    static getPublish(start, end) {
+    static getPublish(start, pageSize) {
         return __awaiter(this, void 0, void 0, function* () {
             const sql = `SELECT A.*, 
         B.nickname AS user_nickname, B.head_thumb AS user_head_thumb, 
@@ -107,7 +107,7 @@ class PostModel {
         `;
             const row = yield database_1.default(sql, [
                 start,
-                end
+                pageSize
             ]).catch((err) => {
                 console.log(err);
             });
